@@ -1,9 +1,12 @@
-const express = require("express")
+const express = require("express");
+const Users = require("../models/Users");
 const router = express.Router();
-router.get("/",(req, res) => {
-	let data={
-        key:"was"
-    }
-	res.json(data)
+
+//Post request sending
+router.post("/",(req, res) => {
+	console.log(req.body);
+    const user=Users(req.body);
+    user.save();
+    res.send(req.body);
 })
 module.exports = router
