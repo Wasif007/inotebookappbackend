@@ -13,6 +13,12 @@ router.post("/",[
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    res.send(req.body);
+    Users.create({
+      name: req.body.name,
+      password: req.body.password,
+      email:req.body.email
+    }).then(user => res.json(user))
+    .catch(err=>{console.log(err)
+    res.json({err:"Please enter new email",message:err.message})});
 })
 module.exports = router
