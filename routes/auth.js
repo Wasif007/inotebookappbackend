@@ -5,6 +5,7 @@ const { body, validationResult } = require('express-validator');
 
 //Post request sending for auth /api/auth/createUser
 router.post("/createUser",[
+  //validator for email name and password
   body('email',"Please enter a valid Email").isEmail(),
   body('password',"Please enter a 5 characters password").isLength({ min: 5 }),
   body('name',"Username must be more than 3 characters").isLength({ min: 3 }),
@@ -16,7 +17,7 @@ router.post("/createUser",[
       return res.status(400).json({ errors: errors.array() });
     } 
     //If email already exists
-
+    //awaitng for finding duplicate emails
     let userCreate=await Users.findOne({email:req.body.email});
     if(userCreate){
       return res.status(400).json({ errors: "Email already exists" });
@@ -27,8 +28,11 @@ router.post("/createUser",[
       password: req.body.password,
       email:req.body.email
     })
+    //sending created user
     res.json(userCreate);
-  }catch (error) {
+  }
+  //catching any more error other than email one
+  catch (error) {
     res.status(500).json({error:"System error"});
     console.error("Bad request");
     }
