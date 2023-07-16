@@ -5,7 +5,9 @@ const { body, validationResult } = require('express-validator');
 const  bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const JWT_Secret="WasifAteeqInoteBookdb";
-//Post request sending for auth /api/auth/createUser
+
+
+//Post request sending for auth /api/auth/createUser - No Login Required
 router.post("/createUser",[
   //validator for email name and password
   body('email',"Please enter a valid Email").isEmail(),
@@ -39,15 +41,54 @@ router.post("/createUser",[
       }
     }
     const authToken = jwt.sign(data, JWT_Secret);
-    console.log(authToken);
+    
 
     //sending created user
     res.json({authToken});
   }
   //catching any more error other than email one
   catch (error) {
-    res.status(500).json({error:"System error"});
-    console.error("Bad request");
+    res.status(500).json({error:"Internal System Error"});
+   
     }
 })
+
+//Post request sending for auth /api/auth/login - No Login Required
+router.post("/login",[
+  //validator for email name and password
+  body('email',"Please enter a valid Email").isEmail(),
+  body('password',"Password must not be empty").exists(),
+  
+],async (req, res) => {
+try {
+  //Destructing email and password
+  
+const {email,password}=req.body;
+//Finding the required user
+const userFetch=await Users.findOne({email});
+//Checking email
+if(!userFetch){
+  return res.status(400).json({ errors: "Please Enter Valid Credentials" });
+}
+const passwordComparison= await bcrypt.compare(password,userFetch.password);
+
+//Checking password
+if(!passwordComparison){
+  return res.status(400).json({ errors: "Please Enter Valid Credentials" });
+}
+//JWT token when user login successfull
+const data={
+  user:{
+    id:userFetch.id
+  }
+}
+const authToken = jwt.sign(data, JWT_Secret);
+res.json({authToken});
+
+}  catch (error) {
+  res.status(500).json({error:"Internal System Error"});
+  
+  }
+});
+
 module.exports = router
