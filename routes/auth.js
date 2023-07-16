@@ -98,9 +98,7 @@ res.json({authToken});
 router.post("/userdata",fetchdata,async (req, res) => {
 try {
   let user=req.user.id;
-  console.log(user);
   const userById=await Users.findById(user).select("-password");
-  console.log(userById);
   res.send(userById);
 
 } catch (error) {

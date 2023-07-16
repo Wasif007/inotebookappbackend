@@ -8,11 +8,15 @@ const fetchdata=(req,res,next)=>{
     if(!tokenFHeader){
         res.status(401).json({error:"Please provide valid token"});
     }
-    //getting the required thing from token
+    try {
+         //getting the required thing from token
     const userDetails=jwt.verify(tokenFHeader,JWT_Secret);
     req.user=userDetails.user;
-    console.log(req.user);
     next();
+    } catch (error) {
+        res.status(401).json({error:"Please provide valid token"});
+    }
+   
 }
 
 module.exports=fetchdata;
