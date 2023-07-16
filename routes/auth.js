@@ -5,8 +5,9 @@ const { body, validationResult } = require('express-validator');
 const  bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const JWT_Secret="WasifAteeqInoteBookdb";
+const fetchdata=require("../middleware/fetchuserdetails");
 
-
+//ROUTE#1
 //Post request sending for auth /api/auth/createUser - No Login Required
 router.post("/createUser",[
   //validator for email name and password
@@ -53,6 +54,7 @@ router.post("/createUser",[
     }
 })
 
+//ROUTE#2
 //Post request sending for auth /api/auth/login - No Login Required
 router.post("/login",[
   //validator for email name and password
@@ -91,4 +93,19 @@ res.json({authToken});
   }
 });
 
+//ROUTE#3
+//Post request sending for getting userdata from jwt token /api/auth/userdata -  Login Required
+router.post("/userdata",fetchdata,async (req, res) => {
+try {
+  let user=req.user.id;
+  console.log(user);
+  const userById=await Users.findById(user).select("-password");
+  console.log(userById);
+  res.send(userById);
+
+} catch (error) {
+  res.status(500).json({error:"Internal System Error"});
+  
+  }
+});
 module.exports = router
