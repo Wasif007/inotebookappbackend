@@ -29,4 +29,20 @@ router.post("/postingnote",fetchdata,[
 	}
 	
 })
+
+//ROUTE#2
+//Route to get all notes of a specified login user /api/notes/fetchingAllNotes
+router.get("/fetchingAllNotes",fetchdata,async (req, res) => {
+	try {
+		let notesFetchingdata=await notes.find({user:req.user.id});
+	res.json(notesFetchingdata);
+	} catch (error) {
+		res.status(500).json({error:"Internal System Error"});
+
+	}
+	
+
+	
+})
+
 module.exports = router
