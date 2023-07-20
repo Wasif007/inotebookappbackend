@@ -46,9 +46,10 @@ router.get("/fetchingAllNotes",fetchdata,async (req, res) => {
 })
 
 //ROUTE#3
-//Route to get note updated of a specified login user /api/notes/updatenote
+//Route to get note updated of a specified login user /api/notes/updatenote/:id
 router.put("/updatenote/:id",fetchdata,async (req, res) => {
-	//getting all the required data
+	try {
+		//getting all the required data
 	let {title,description,tag}=req.body;
 	let newNote={};
 	//if title tag and description is available putting it in newNote object
@@ -62,15 +63,45 @@ router.put("/updatenote/:id",fetchdata,async (req, res) => {
 		newNote.tag=tag;
 	}
 	let newNotes=await notes.findById(req.params.id);
+	//If no note is found return with an error
 	if(!notes){
 		return res.status(404).json({error:"Not Found"});
 	}
+	//if other user is trying to update other user note restrict him/her
 	if(req.user.id!==newNotes.user.toString()){
 		return res.status(401).json({error:"Not Found"});
 	}
 	let updatedNotes=await notes.findByIdAndUpdate(req.params.id,{$set:newNote},{new:true});
 	res.send(updatedNotes);
-});
+	} catch (error) {
+		res.status(500).json({error:"Internal System Error"});
+
+	}
 	
+});
+
+//ROUTE#4
+//Route to delete a note of a specified login user /api/notes/deletenote/:id
+router.delete("/deletenote/:id",fetchdata,async (req, res) => {
+	try {
+		//first find the one to be deleted
+		let newNotes=await notes.findById(req.params.id);
+		// if not found
+	if(!notes){
+		return res.status(404).json({error:"Not Found"});
+	}
+	//if other user is trying to delete note of other user
+	if(req.user.id!==newNotes.user.toString()){
+		return res.status(401).json({error:"Not Found"});
+	}
+	//delete it 
+	let updatedNotes=await notes.findByIdAndDelete(req.params.id);
+	res.send("Success: Deleted a note");
+	} catch (error) {
+		res.status(500).json({error:"Internal System Error"});
+
+	}
+	
+});
 
 module.exports = router
