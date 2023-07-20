@@ -45,4 +45,32 @@ router.get("/fetchingAllNotes",fetchdata,async (req, res) => {
 	
 })
 
+//ROUTE#3
+//Route to get note updated of a specified login user /api/notes/updatenote
+router.put("/updatenote/:id",fetchdata,async (req, res) => {
+	//getting all the required data
+	let {title,description,tag}=req.body;
+	let newNote={};
+	//if title tag and description is available putting it in newNote object
+	if(title){
+		newNote.title=title;
+	}
+	if(description){
+		newNote.description=description;
+	}
+	if(tag){
+		newNote.tag=tag;
+	}
+	let newNotes=await notes.findById(req.params.id);
+	if(!notes){
+		return res.status(404).json({error:"Not Found"});
+	}
+	if(req.user.id!==newNotes.user.toString()){
+		return res.status(401).json({error:"Not Found"});
+	}
+	let updatedNotes=await notes.findByIdAndUpdate(req.params.id,{$set:newNote},{new:true});
+	res.send(updatedNotes);
+});
+	
+
 module.exports = router
