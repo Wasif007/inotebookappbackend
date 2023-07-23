@@ -4,7 +4,7 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const  bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const JWT_Secret="WasifAteeqInoteBookdb";
+const JWT_Secret='WasifAteeq';
 const fetchdata=require("../middleware/fetchuserdetails");
 
 //ROUTE#1
@@ -28,17 +28,17 @@ router.post("/createUser",[
       return res.status(400).json({ errors: "Email already exists" });
     }
       //Adding salt and hash to make password strong
-        const salt = await bcrypt.genSaltSync(10);
+        const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(req.body.password, salt);
     //creating  a new user for db
-    userCreate=await Users.create({
+    let newuserCreate=await Users.create({
       name: req.body.name,
       password: hash,
       email:req.body.email
     });
     const data={
       user:{
-        id:userCreate.id
+        id:newuserCreate.id
       }
     }
     const authToken = jwt.sign(data, JWT_Secret);

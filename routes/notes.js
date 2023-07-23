@@ -64,7 +64,7 @@ router.put("/updatenote/:id",fetchdata,async (req, res) => {
 	}
 	let newNotes=await notes.findById(req.params.id);
 	//If no note is found return with an error
-	if(!notes){
+	if(!newNotes){
 		return res.status(404).json({error:"Not Found"});
 	}
 	//if other user is trying to update other user note restrict him/her
@@ -87,7 +87,7 @@ router.delete("/deletenote/:id",fetchdata,async (req, res) => {
 		//first find the one to be deleted
 		let newNotes=await notes.findById(req.params.id);
 		// if not found
-	if(!notes){
+	if(!newNotes){
 		return res.status(404).json({error:"Not Found"});
 	}
 	//if other user is trying to delete note of other user
@@ -96,7 +96,7 @@ router.delete("/deletenote/:id",fetchdata,async (req, res) => {
 	}
 	//delete it 
 	let updatedNotes=await notes.findByIdAndDelete(req.params.id);
-	res.send("Success: Deleted a note");
+	res.send(updatedNotes);
 	} catch (error) {
 		res.status(500).json({error:"Internal System Error"});
 
