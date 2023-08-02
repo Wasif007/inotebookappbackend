@@ -15,17 +15,18 @@ router.post("/createUser",[
   body('password',"Please enter a 5 characters password").isLength({ min: 5 }),
   body('name',"Username must be more than 3 characters").isLength({ min: 3 }),
 ],async (req, res) => {
+  let success=false;
   try {
   //Checking for any error of data sent
 	const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ success,errors: errors.array() });
     } 
     //If email already exists
     //awaitng for finding duplicate emails
     let userCreate=await Users.findOne({email:req.body.email});
     if(userCreate){
-      return res.status(400).json({ errors: "Email already exists" });
+      return res.status(400).json({ success,errors: "Email already exists" });
     }
       //Adding salt and hash to make password strong
         const salt = await bcrypt.genSalt(10);
@@ -41,11 +42,12 @@ router.post("/createUser",[
         id:newuserCreate.id
       }
     }
+    success=true;
     const authToken = jwt.sign(data, JWT_Secret);
     
 
     //sending created user
-    res.json({authToken});
+    res.json({success,authToken});
   }
   //catching any more error other than email one
   catch (error) {
