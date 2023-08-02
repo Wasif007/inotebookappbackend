@@ -62,6 +62,8 @@ router.post("/login",[
   body('password',"Password must not be empty").exists(),
   
 ],async (req, res) => {
+  let success=false;
+
 try {
   //Destructing email and password
   
@@ -70,13 +72,13 @@ const {email,password}=req.body;
 const userFetch=await Users.findOne({email});
 //Checking email
 if(!userFetch){
-  return res.status(400).json({ errors: "Please Enter Valid Credentials" });
+  return res.status(400).json({ success,errors: "Please Enter Valid Credentials" });
 }
 const passwordComparison= await bcrypt.compare(password,userFetch.password);
 
 //Checking password
 if(!passwordComparison){
-  return res.status(400).json({ errors: "Please Enter Valid Credentials" });
+  return res.status(400).json({ success,errors: "Please Enter Valid Credentials" });
 }
 //JWT token when user login successfull
 const data={
@@ -85,7 +87,8 @@ const data={
   }
 }
 const authToken = jwt.sign(data, JWT_Secret);
-res.json({authToken});
+success= true;
+res.json({success,authToken});
 
 }  catch (error) {
   res.status(500).json({error:"Internal System Error"});
